@@ -34,6 +34,8 @@ a.fruit-link {
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
+  text-indent: -9999px;
+  overflow: hidden;
 }
 .store-product-actions {
   display: inline-block;
@@ -108,6 +110,10 @@ button.store-product-add {
 
 .cart .react-numeric-input input {
   width: 100px;
+}
+
+.cart tfoot td {
+  padding: .5em;
 }
 
 .cart-actions td {

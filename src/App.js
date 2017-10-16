@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import NumericInput from 'react-numeric-input';
 import './App.css';
 
+const TAX_RATE = 0.06;
+const TAX_TEXT = '6% sales tax'
 // prices are in cents
 const PRODUCTS = [
   {
@@ -103,7 +105,6 @@ class App extends Component {
     let total = 0;
     let storeProducts = PRODUCTS.map( (p, i) => {
       let quantity = this.state.cart[p.name];
-      let price = p.price(quantity);
       let dealText = (p.dealText) ? (' or ' + p.dealText) : '';
       let productStyle = {
         backgroundImage: 'url(' + p.image + ')'
@@ -111,7 +112,9 @@ class App extends Component {
       let quantityInfo = (quantity) ? (<div className="quantity-in-cart">{this.state.cart[p.name]} in cart</div>) : '';
       return (
         <div className="store-product" key={i}>
-          <a className="fruit-link" style={productStyle} key={i} href={'#' + p.name} onClick={this.addFruit(p.name)}></a>
+          <a className="fruit-link" style={productStyle} key={i} href={'#' + p.name} onClick={this.addFruit(p.name)}>
+            {p.name}
+          </a>
           <div className="store-product-actions">
             <button className="store-product-add" onClick={this.addFruit(p.name)}>add to cart</button>
             <div className="store-quantity-info">
@@ -145,7 +148,9 @@ class App extends Component {
       return (
         <tr key={i}>
           <td>
-            <a className="fruit-link" style={productStyle} key={i} href={'#' + p.name} onClick={this.addFruit(p.name)}></a>
+            <a className="fruit-link" style={productStyle} key={i} href={'#' + p.name} onClick={this.addFruit(p.name)}>
+              {p.name}
+            </a>
           </td>
           <td>
             <strong>{name}</strong>
@@ -169,6 +174,7 @@ class App extends Component {
     } else {
       cartClasses += ' cart-hidden';
     }
+    let tax = Math.ceil(total * TAX_RATE);
     return (
       <div className="App">
         <section className="store-products">
@@ -187,10 +193,20 @@ class App extends Component {
               {cartProductRows}
             </tbody>
             <tfoot>
+              <tr key="subtotal">
+                <td colSpan="2"></td>
+                <td><strong>subtotal</strong></td>
+                <td className="currency">{ dollarsFromCents(total) }</td>
+              </tr>
+              <tr key="tax">
+                <td colSpan="2"></td>
+                <td><strong>{TAX_TEXT}</strong></td>
+                <td className="currency">{ dollarsFromCents(tax) }</td>
+              </tr>
               <tr key="total">
                 <td colSpan="2"></td>
                 <td><strong>total</strong></td>
-                <td className="currency">{ dollarsFromCents(total) }</td>
+                <td className="currency">{ dollarsFromCents(total + tax) }</td>
               </tr>
               <tr className="cart-actions" key="cart-actions">
                 <td colSpan="2"></td>
