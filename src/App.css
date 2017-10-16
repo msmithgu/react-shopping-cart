@@ -1,28 +1,130 @@
+html, body {
+  background: black;
+}
 .App {
   padding: 1em;
 }
 
 section {
-  border: 1px solid black;
+  background: white;
+  border: 3px solid orange;
   padding: 1em;
   margin: 1em;
   display: inline-block;
   float: left;
 }
 
-table {
+/* clearfix */
+.store-product:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.store-product {
+  clear: both;
+  margin: 1em 0;
+  width: 350px;
+}
+a.fruit-link {
+  display: inline-block;
+  float: left;
+  margin-right: 20px;
+  width: 100px;
+  height: 100px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.store-product-actions {
+  display: inline-block;
+  float: right;
+  margin: 20px 0 0 20px;
+}
+.store-product-text {
+  padding: 20px 120px;
+}
+h3.store-product-name {
+  margin: 0;
+}
+.store-price-info {
+  margin-left: 1em;
+  color: gray;
+  font-size: small;
+}
+.store-product-actions {
+}
+button.store-product-add {
+  padding: .5em;
+  background: orange;
+  color: white;
+  font-weight: bold;
+  text-transform: uppercase;
+  outline: none;
+}
+.store-quantity-info {
+  margin: .5em 0 0 1em;
+  color: gray;
+}
+
+
+.cart {
+  opacity: 0;
+}
+.cart-shown {
+  opacity: 1;
+  transition: .3s all ease;
+}
+.cart-hidden {
+  opacity: 0;
+  transition: .3s all ease;
+}
+.cart table {
   border-collapse: collapse;
 }
 
-table td {
-  border: 1px solid gray;
-  padding: .5em;
+.cart table td {
+  border: none;
+  border-bottom: 1px solid #333;
+  padding: 1.5em 1em;
+}
+.cart table tfoot td {
+  border: none;
 }
 
-td.currency {
+.cart td.currency {
   text-align: right;
 }
 
-img.fruit {
+.cart .fruit-link {
+  height: 20px;
+  width: 20px;
+}
+
+.cart-price-info {
+  margin-left: 1em;
+  color: gray;
+  font-size: small;
+}
+
+.cart .react-numeric-input input {
   width: 100px;
+}
+
+.cart-actions td {
+  text-align: right;
+}
+a.cart-empty,
+a.cart-empty:visited {
+  display: inline-block;
+  color: gray;
+  text-decoration: none;
+  padding: 1em;
+}
+button.cart-pay {
+  padding: 1em;
+  background: orange;
+  color: white;
+  font-weight: bold;
+  text-transform: uppercase;
+  outline: none;
 }

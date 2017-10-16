@@ -35,7 +35,8 @@ const PRODUCTS = [
     name: 'papaya',
     pluralName: 'papayas',
     image: 'images/papaya.png',
-    priceText: '$0.50 each or 3 for $1',
+    priceText: '$0.50 each',
+    dealText: '3 for $1',
     price: (quantity) => {
       let odds = quantity % 3;
       return (((quantity - odds)/3) * 100) + (odds * 50);
@@ -54,20 +55,39 @@ class App extends Component {
       cart: {
         'apple': 5,
         'banana': 8,
-        'orange': 3,
+        'orange': 0,
         'papaya': 4,
       }
     };
+    this.emptyCart = this.emptyCart.bind(this);
   }
   addFruit(productName) {
-    this.setState( (prevState) => {
-      prevState.cart[productName]++;
-      return prevState;
-    } );
+    return (e) => {
+      e.preventDefault();
+      this.setState( (prevState) => {
+        prevState.cart[productName]++;
+        return prevState;
+      } );
+    }
   }
   zeroFruit(productName) {
+    return (e) => {
+      e.preventDefault();
+      this.setState( (prevState) => {
+        prevState.cart[productName] = 0;
+        return prevState;
+      } );
+    }
+  }
+  emptyCart(e) {
+    e.preventDefault();
     this.setState( (prevState) => {
-      prevState.cart[productName] = 0;
+      prevState.cart = {
+        'apple': 0,
+        'banana': 0,
+        'orange': 0,
+        'papaya': 0,
+      };
       return prevState;
     } );
   }
@@ -81,55 +101,90 @@ class App extends Component {
   }
   render() {
     let total = 0;
-    let productNames = PRODUCTS.map( (p, i) => {
-      return (<li key={i}>{this.state.cart[p.name]} {p.pluralName}</li>);
-    } );
-    let productImages = PRODUCTS.map( (p, i) => {
+    let storeProducts = PRODUCTS.map( (p, i) => {
+      let quantity = this.state.cart[p.name];
+      let price = p.price(quantity);
+      let dealText = (p.dealText) ? (' or ' + p.dealText) : '';
+      let productStyle = {
+        backgroundImage: 'url(' + p.image + ')'
+      };
+      let quantityInfo = (quantity) ? (<div className="quantity-in-cart">{this.state.cart[p.name]} in cart</div>) : '';
       return (
-        <a key={i} href={'#' + p.name} onClick={() => this.addFruit(p.name)}>
-          <img className="fruit" src={p.image} alt={p.name} />
-        </a>
+        <div className="store-product" key={i}>
+          <a className="fruit-link" style={productStyle} key={i} href={'#' + p.name} onClick={this.addFruit(p.name)}></a>
+          <div className="store-product-actions">
+            <button className="store-product-add" onClick={this.addFruit(p.name)}>add to cart</button>
+            <div className="store-quantity-info">
+              {quantityInfo}
+            </div>
+          </div>
+          <div className="store-product-text">
+            <h3 className="store-product-name">{p.name}</h3>
+            <div className="store-price-info">
+              <div className="store-price">{p.priceText}</div>
+              <div className="store-deal">{dealText}</div>
+            </div>
+          </div>
+        </div>
       );
     } );
-    let productRows = PRODUCTS.map( (p, i) => {
+    let cartProductRows = PRODUCTS
+    .map( (p, i) => {
+      let productStyle = {
+        backgroundImage: 'url(' + p.image + ')'
+      };
       let quantity = this.state.cart[p.name];
+      if (!quantity) {
+        return null;
+      }
       let name = (quantity === 1) ? p.name : p.pluralName;
       let price = p.price(quantity);
+      let priceText = (p.priceText) ? (<div>{p.priceText}</div>) : '';
+      let dealText = (p.dealText) ? (<div>{' or ' + p.dealText}</div>) : '';
       total += price;
       return (
         <tr key={i}>
           <td>
-            {name}&nbsp;
-            <button onClick={() => this.zeroFruit(p.name)}>x</button>
+            <a className="fruit-link" style={productStyle} key={i} href={'#' + p.name} onClick={this.addFruit(p.name)}></a>
           </td>
-          <td><NumericInput min={0} value={quantity} onChange={this.cartChange(p.name)}/></td>
-          <td>{p.priceText}</td>
+          <td>
+            <strong>{name}</strong>
+            <div className="cart-price-info">
+              {priceText}
+              {dealText}
+            </div>
+          </td>
+          <td>
+            <NumericInput min={0} value={quantity} onChange={this.cartChange(p.name)}/>
+            &nbsp;
+            <button onClick={this.zeroFruit(p.name)}>x</button>
+          </td>
           <td className="currency">{ dollarsFromCents(price) }</td>
         </tr>
       );
     } );
+    let cartClasses = 'cart';
+    if (total) {
+      cartClasses += ' cart-shown';
+    } else {
+      cartClasses += ' cart-hidden';
+    }
     return (
       <div className="App">
-        <section>
-          <ul>
-            {productNames}
-          </ul>
+        <section className="store-products">
+          {storeProducts}
         </section>
-        <section>
-          {productImages}
-        </section>
-        <section>
+        <section className={cartClasses}>
           <table>
             <thead>
               <tr>
-                <th>product</th>
+                <th colSpan="2">product</th>
                 <th>quantity</th>
-                <th>price</th>
                 <th>subtotal</th>
               </tr>
             </thead>
             <tbody>
-              {productRows}
+              {cartProductRows}
             </tbody>
             <tfoot>
               <tr key="total">
@@ -137,25 +192,17 @@ class App extends Component {
                 <td><strong>total</strong></td>
                 <td className="currency">{ dollarsFromCents(total) }</td>
               </tr>
+              <tr className="cart-actions" key="cart-actions">
+                <td colSpan="2"></td>
+                <td>
+                  <a className="cart-empty" href="#empty-cart" onClick={ this.emptyCart }>empty cart</a>
+                </td>
+                <td>
+                  <button className="cart-pay">pay now</button>
+                </td>
+              </tr>
             </tfoot>
           </table>
-        </section>
-        <section>
-          <h1>Ideas</h1>
-          <ul>
-            <li>clickable images + regular side shopping cart</li>
-            <li>cart as simple table with click-to-buy total</li>
-            <li>random fruit option</li>
-            <li>fruit roll up option; slot machine style buy</li>
-            <li>no drag and drop from inventory into cart
-              <br />because we want buying fruit to be easy, impulsive, fun.</li>
-            <li>admin view for price and deal manipulation?
-              <br />Not this time, because we're focusing on customer experience.</li>
-            <li>animation? Yes! Fun!</li>
-            <li>different product categories that get shown in balance chart
-              <br />(ex: pie chart of veggies vs. fruits vs. meat vs. other)</li>
-            <li>implement sales tax</li>
-          </ul>
         </section>
       </div>
     );
