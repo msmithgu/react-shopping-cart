@@ -55,10 +55,10 @@ class App extends Component {
     super(props);
     this.state = {
       cart: {
-        'apple': 5,
-        'banana': 8,
+        'apple': 0,
+        'banana': 0,
         'orange': 0,
-        'papaya': 4,
+        'papaya': 0,
       }
     };
     this.emptyCart = this.emptyCart.bind(this);
